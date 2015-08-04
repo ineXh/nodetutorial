@@ -11,6 +11,7 @@ function handler(req, res){
 				res.writeHead(500);
 				return res.end('Error loading index.html');
 			}
+			console.log(res);
 			res.writeHead(200);
 			res.end(data);
 		});
@@ -18,6 +19,6 @@ function handler(req, res){
 
 io.sockets.on('connection', function(socket){
 		socket.on('testconnection', function(){
-			socket.emit('testthis', "Hello World");
+			socket.emit('testthis', "Hello World1");
 		});
 });	
