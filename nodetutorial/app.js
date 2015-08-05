@@ -18,7 +18,14 @@ function handler(req, res){
 }
 
 io.sockets.on('connection', function(socket){
-		socket.on('testconnection', function(){
-			socket.emit('testthis', "Hello World1");
+		socket.on('testconnection', function(username){
+			var str = "Hello World1 " + username;
+			// socket.emit only sends back to the client who sent the original information ('testconnection')
+			//socket.emit('testthis', str);
+			// broadcast, sends it to all client except the original client
+			//socket.broadcast.emit('testthis', str);
+			
+			// send to everybody
+			io.sockets.emit('testthis', str);
 		});
 });	
