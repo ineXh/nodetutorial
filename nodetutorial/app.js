@@ -16,16 +16,30 @@ function handler(req, res){
 			res.end(data);
 		});
 }
-
+var gamenumbers = [1,2,3];
 io.sockets.on('connection', function(socket){
-		socket.on('testconnection', function(username){
-			var str = "Hello World1 " + username;
-			// socket.emit only sends back to the client who sent the original information ('testconnection')
-			//socket.emit('testthis', str);
-			// broadcast, sends it to all client except the original client
-			//socket.broadcast.emit('testthis', str);
-			
-			// send to everybody
-			io.sockets.emit('testthis', str);
+		socket.on('clientconnects', function(playername){			
+			//io.sockets.emit('newplayer', playername);
+			socket.broadcast.emit('newplayer', playername);
 		});
+		socket.on('startgame', function(playername){
+			gamenumbers.sort(function(){return 0.5 - Math.random()})
+			console.log(gamenumbers);
+			io.sockets.emit('gamestarted', playername);
+		});
+		socket.on('sendbutton', function(data, playername){
+			if(data == 'button1'){
+				var thisbutton = gamenumbers[0];
+			}
+			if(data == 'button2'){
+				var thisbutton = gamenumbers[1];
+			}
+			if(data == 'button3'){
+				var thisbutton = gamenumbers[2];
+			}
+			if(thisbutton == 1){didwin = 1;}
+			io.sockets.emit('getbutton', data, thisbutton);
+			if(thisbutton == 1){io.sockets.emit('winner', playername);}
+		});
+		
 });	

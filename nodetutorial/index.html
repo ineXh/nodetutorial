@@ -3,21 +3,65 @@
 		
 <html>
 	<head>
-		<title>Name Form Test</title>
+		<title>Number Game</title>
 	</head>
 	
 		<script type="text/javascript">
 		// Network Functions
 			var socket = io.connect('http://localhost:8080');
 			
+			var randid = Math.floor(Math.random()*9999);
+			var playername = "player" + randid;
+			
 			function submitname(form){
-				var username = form.name.value;
-				socket.emit('testconnection', username);
+				var button = form.name;
+				socket.emit('sendbutton', button, playername);
+			}
+			function startgame(form){
+				var button = form.name;
+				socket.emit('startgame', playername);
+				form.gamestart.disabled = true;
 			}
 			
+			socket.emit('clientconnects', playername);
 			
-			socket.on('testthis', function(data){
-				alert(data + ", got it!");
+			socket.on('newplayer', function(name){
+				document.getElementById('thistext').innerHTML 
+					= name + " has entered the game.";
+			});
+			
+			socket.on('getbutton', function(data, thisbutton){
+				if(data == 'button1'){
+					button1.button1.value = thisbutton;
+					button1.button1.disabled = true;
+				}
+				if(data == 'button2'){
+					button2.button2.value = thisbutton;
+					button2.button2.disabled = true;
+				}
+				if(data == 'button3'){
+					button3.button3.value = thisbutton;
+					button3.button3.disabled = true;
+				}
+			});
+			
+			// show game started
+			socket.on('gamestarted', function(name){
+				gamestart.gamestart.disabled = true;
+				button1.button1.disabled = false;
+				button2.button2.disabled = false;
+				button3.button3.disabled = false;
+				button1.button1.value = "Button 1";
+				button2.button2.value = "Button 2";
+				button3.button3.value = "Button 3";
+				document.getElementById('thistext').innerHTML = 
+					name + " started the game.";
+				
+			});
+			
+			socket.on('winner', function(name){
+				gamestart.gamestart.disabled = false;
+				document.getElementById('thistext').innerHTML = name + " found the 1 and wins the game!";
 			});
 		// /////////////////
 		</script>
@@ -26,6 +70,28 @@
 			<input type='text' name='name' value='' />
 			<input 	type='button' 
 					value='Enter Name' 
-					onclick='submitname(this.form)'/>
+					onclick='submitname(this.form)'/></form>
+			<br>
+			There are 3 numbers: 1, 2, 3, all hiding behind a button, the first person to find the '1' is the winner.
+			<br><br>
+			<form name = 'button1' action='' method = 'post'/>
+			<input type = 'button' name = 'button1' value='Button 1' 
+				onclick = 'submitname(this.form)'/></form>
+			&nbsp;
+			<br><br>
+			<form name = 'button2' action='' method = 'post'/>
+			<input type = 'button' name = 'button2' value='Button 2' 
+				onclick = 'submitname(this.form)'/></form>
+			&nbsp;
+			<br><br>
+			<form name = 'button3' action='' method = 'post'/>
+			<input type = 'button' name = 'button3' value='Button 3' 
+				onclick = 'submitname(this.form)'/></form>
+			<br><br><br>
+			<form name = 'gamestart' action='' method='post'/>
+			<input type='button' name='gamestart' value='Start Game'
+				onclick='startgame(this.form)'/></form>
+			<br><br><br>
+			<div id='thistext'></div>	
 		</body>
 </html>
