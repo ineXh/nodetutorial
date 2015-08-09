@@ -16,30 +16,32 @@ function handler(req, res){
 			res.end(data);
 		});
 }
-var gamenumbers = [1,2,3];
+
 io.sockets.on('connection', function(socket){
-		socket.on('clientconnects', function(playername){			
-			//io.sockets.emit('newplayer', playername);
-			socket.broadcast.emit('newplayer', playername);
+	socket.on('entername', function(queryname){
+		socket.broadcast.emit("nameadded", queryname);
+	});
+	socket.on('getname', function(){
+		var mysql = require('mysql');
+		var TEST_DATABASE = 'nodetut';
+		var TEST_TABLE= 'names';
+		var client = mysql.createClient({
+			user: 'root',
+			password: '',
 		});
-		socket.on('startgame', function(playername){
-			gamenumbers.sort(function(){return 0.5 - Math.random()})
-			console.log(gamenumbers);
-			io.sockets.emit('gamestarted', playername);
-		});
-		socket.on('sendbutton', function(data, playername){
-			if(data == 'button1'){
-				var thisbutton = gamenumbers[0];
-			}
-			if(data == 'button2'){
-				var thisbutton = gamenumbers[1];
-			}
-			if(data == 'button3'){
-				var thisbutton = gamenumbers[2];
-			}
-			if(thisbutton == 1){didwin = 1;}
-			io.sockets.emit('getbutton', data, thisbutton);
-			if(thisbutton == 1){io.sockets.emit('winner', playername);}
-		});
-		
+		client.query('USE ' + TEST_DATABASE);
+		client.query('SELECT * FROM ' + TEST_TABLE,
+			function selectCb(err, results){
+				if(err){
+					throw err;
+				}
+				var querystring = '';
+				var querylength = results.length;
+				for(var i = 0; i < querylength; i++){
+					querystring = querystring + results(i).person + ",";
+				}
+				socket.emit("givennames", querystring);
+				client.end();
+			});
+	});
 });	

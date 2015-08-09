@@ -3,94 +3,68 @@
 		
 <html>
 	<head>
-		<title>Number Game</title>
+		<title>Find the One</title>
 	</head>
 	
 		<script type="text/javascript">
 		// Network Functions
 			var socket = io.connect('http://localhost:8080');
 			
-			var randid = Math.floor(Math.random()*9999);
-			var playername = "player" + randid;
+			socket.on('nameadded', function(queryname){
+				document.getElementById('thistext').innerHTML
+					= queryname + " was added to the database";
+			});
 			
-			function submitname(form){
-				var button = form.name;
-				socket.emit('sendbutton', button, playername);
+			socket.on('givennames', function(names){
+				document.getElementById('this.text').innerHTML
+					= names;
+			});
+			
+			function getquery(){
+				socket.emit('getname');
 			}
-			function startgame(form){
-				var button = form.name;
-				socket.emit('startgame', playername);
-				form.gamestart.disabled = true;
+			function submitquery(form){
+				var queryname = form.personname.value;
+				var ajaxRequest;
+				try{
+					ajaxRequest = new XMLHttpRequest();
+				} catch(e){
+						try{
+							ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+						}catch(e){
+							try{
+								ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+							}catch(e){
+								alert("Your browser broke!");
+								return false;
+							}
+						}
+					}
 			}
-			
-			socket.emit('clientconnects', playername);
-			
-			socket.on('newplayer', function(name){
-				document.getElementById('thistext').innerHTML 
-					= name + " has entered the game.";
-			});
-			
-			socket.on('getbutton', function(data, thisbutton){
-				if(data == 'button1'){
-					button1.button1.value = thisbutton;
-					button1.button1.disabled = true;
+			ajaxRequest.onreadystatechange = function(){
+				if(ajaxRequest.readState == 4){
+					document.getElementById('thistext').innerHTML = 
+						ajaxRequest.responseText;
+						socket.emit('entername', queryname);
 				}
-				if(data == 'button2'){
-					button2.button2.value = thisbutton;
-					button2.button2.disabled = true;
-				}
-				if(data == 'button3'){
-					button3.button3.value = thisbutton;
-					button3.button3.disabled = true;
-				}
-			});
-			
-			// show game started
-			socket.on('gamestarted', function(name){
-				gamestart.gamestart.disabled = true;
-				button1.button1.disabled = false;
-				button2.button2.disabled = false;
-				button3.button3.disabled = false;
-				button1.button1.value = "Button 1";
-				button2.button2.value = "Button 2";
-				button3.button3.value = "Button 3";
-				document.getElementById('thistext').innerHTML = 
-					name + " started the game.";
-				
-			});
-			
-			socket.on('winner', function(name){
-				gamestart.gamestart.disabled = false;
-				document.getElementById('thistext').innerHTML = name + " found the 1 and wins the game!";
-			});
+				var queryString = "?name=" + queryname;
+				ajaxRequest.open("GET", "addname.php" + queryString, true);
+				ajaxRequest.send(null);
+			}
 		// /////////////////
 		</script>
 		<body>
-			<form name='sendname' action = '' method = 'get'/>
-			<input type='text' name='name' value='' />
-			<input 	type='button' 
-					value='Enter Name' 
-					onclick='submitname(this.form)'/></form>
+			Enter Name into Inventory
+			
+			<form name='query' action = '' method='post'/>
+			<input type='text' name='personname' value=''/>
+			<input type='button' name='button' value='Enter Name'
+				onclick='submitquery(this.form)'/></form>
 			<br>
-			There are 3 numbers: 1, 2, 3, all hiding behind a button, the first person to find the '1' is the winner.
-			<br><br>
-			<form name = 'button1' action='' method = 'post'/>
-			<input type = 'button' name = 'button1' value='Button 1' 
-				onclick = 'submitname(this.form)'/></form>
-			&nbsp;
-			<br><br>
-			<form name = 'button2' action='' method = 'post'/>
-			<input type = 'button' name = 'button2' value='Button 2' 
-				onclick = 'submitname(this.form)'/></form>
-			&nbsp;
-			<br><br>
-			<form name = 'button3' action='' method = 'post'/>
-			<input type = 'button' name = 'button3' value='Button 3' 
-				onclick = 'submitname(this.form)'/></form>
-			<br><br><br>
-			<form name = 'gamestart' action='' method='post'/>
-			<input type='button' name='gamestart' value='Start Game'
-				onclick='startgame(this.form)'/></form>
+			Get Names from Inventory
+			<form name='query' action='' method='post'/>
+			<input type='button' name='button2' value='Get Names' onclick='getquery()'/></form>
+			
 			<br><br><br>
 			<div id='thistext'></div>	
 		</body>
