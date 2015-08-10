@@ -25,12 +25,21 @@ io.sockets.on('connection', function(socket){
 		var mysql = require('mysql');
 		var TEST_DATABASE = 'nodetut';
 		var TEST_TABLE= 'names';
+		
+		var connection = mysql.createConnection({
+		  //host     : 'example.org',
+		  user     : 'root',
+		  password : '',
+		});
+
+		/*
 		var client = mysql.createClient({
 			user: 'root',
 			password: '',
-		});
-		client.query('USE ' + TEST_DATABASE);
-		client.query('SELECT * FROM ' + TEST_TABLE,
+		});*/
+		connection.query('USE ' + TEST_DATABASE);
+		console.log('TEST_DATABASE')
+		connection.query('SELECT * FROM ' + TEST_TABLE,
 			function selectCb(err, results){
 				if(err){
 					throw err;
@@ -41,7 +50,7 @@ io.sockets.on('connection', function(socket){
 					querystring = querystring + results(i).person + ",";
 				}
 				socket.emit("givennames", querystring);
-				client.end();
+				connection.end();
 			});
 	});
 });	
