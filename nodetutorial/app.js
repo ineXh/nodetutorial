@@ -38,19 +38,25 @@ io.sockets.on('connection', function(socket){
 			password: '',
 		});*/
 		connection.query('USE ' + TEST_DATABASE);
-		console.log('TEST_DATABASE')
+		//console.log('TEST_DATABASE')
+		//console.log('SELECT * FROM ' + TEST_TABLE);
 		connection.query('SELECT * FROM ' + TEST_TABLE,
 			function selectCb(err, results){
+				//console.log("selectCb");
 				if(err){
+					console.log("error!!");
 					throw err;
 				}
+				//console.log(results);
 				var querystring = '';
 				var querylength = results.length;
+				..console.log(querylength);
 				for(var i = 0; i < querylength; i++){
-					querystring = querystring + results(i).person + ",";
+					querystring = querystring + results[i].person + ",";
 				}
+				//console.log(querystring);
 				socket.emit("givennames", querystring);
 				connection.end();
 			});
-	});
-});	
+	}); // end on getname
+});	// end on getconnection
