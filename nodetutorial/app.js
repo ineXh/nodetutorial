@@ -1,17 +1,19 @@
 var app = require('http').createServer(handler)
 	, io = require('socket.io').listen(app)
 	, fs = require('fs')
+	, path = require('path')
 	
 app.listen(8080);
 
 function handler(req, res){
+	var _dirname = path.resolve(path.dirname());
 	fs.readFile(_dirname + '/index.html',
 		function(err, data){
 			if(err){
 				res.writeHead(500);
 				return res.end('Error loading index.html');
 			}
-			console.log(res);
+			//console.log(res);
 			res.writeHead(200);
 			res.end(data);
 		});
