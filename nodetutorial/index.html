@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-		<script src = "http://localhost:8080/socket.io/socket.io.js"></script>
+		<!--<script src = "http://localhost:8080/socket.io/socket.io.js"></script>-->
+		<script src = "http://104.197.23.67:8080/socket.io/socket.io.js"></script>
 		
 <html>
 	<head>
@@ -8,7 +9,8 @@
 	
 		<script type="text/javascript">
 		// Network Functions
-			var socket = io.connect('http://localhost:8080');
+			//var socket = io.connect('http://localhost:8080');
+			var socket = io.connect('http://104.197.23.67:8080');
 			
 			function submitname(form){
 				var username = form.name.value;
